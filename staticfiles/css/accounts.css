@@ -1,0 +1,30 @@
+/* static/css/accounts.css */
+.account-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.account-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.account-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.account-card .badge {
+    font-size: 0.7rem;
+}
+
+.account-card .card-footer {
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .account-card {
+        margin-bottom: 1.5rem;
+    }
+}
