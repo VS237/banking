@@ -1,0 +1,117 @@
+<!-- django_mobile_money.html -->
+{% extends 'banking/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center min-vh-100 align-items-center">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-mobile-alt me-2"></i>Mobile Money Transfer
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="mobileMoneyForm">
+                        {% csrf_token %}
+                        
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label small fw-bold">
+                                <i class="fas fa-phone me-1"></i>Mobile Number
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-phone text-muted"></i>
+                                </span>
+                                <input type="tel" 
+                                       name="phone_number"
+                                       class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}" 
+                                       id="phone_number" 
+                                       placeholder="07XX XXX XXX"
+                                       required
+                                       pattern="[0-9]{10}"
+                                       maxlength="10"
+                                       value="{{ form.phone_number.value|default:'' }}">
+                            </div>
+                            {% if form.phone_number.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.phone_number.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Secret Code -->
+                        <div class="mb-4">
+                            <label for="secret_code" class="form-label small fw-bold">
+                                <i class="fas fa-lock me-1"></i>Secret Code
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-key text-muted"></i>
+                                </span>
+                                <input type="password" 
+                                       name="secret_code"
+                                       class="form-control {% if form.secret_code.errors %}is-invalid{% endif %}" 
+                                       id="secret_code" 
+                                       placeholder="Enter secret code"
+                                       required
+                                       minlength="4"
+                                       maxlength="6">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            {% if form.secret_code.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.secret_code.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Send Money
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="card-footer bg-light text-center py-2">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Your transaction is secure and encrypted
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Same JavaScript as above for functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.getElementById('togglePassword');
+    const secretCode = document.getElementById('secret_code');
+    const phoneNumber = document.getElementById('phone_number');
+
+    if (togglePassword && secretCode) {
+        togglePassword.addEventListener('click', function() {
+            const type = secretCode.getAttribute('type') === 'password' ? 'text' : 'password';
+            secretCode.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+    }
+
+    if (phoneNumber) {
+        phoneNumber.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.substring(0, 10);
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

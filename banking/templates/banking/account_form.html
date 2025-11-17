@@ -1,0 +1,169 @@
+<!-- templates/banking/account_form.html -->
+{% extends "banking/base.html" %}
+
+{% block title %}{{ title }} - Banking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0 text-white">{{ title }}</h4>
+                </div>
+                <div class="card-body">
+                    {% if account %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Editing Account: <strong>{{ account.account_number }}</strong>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.account_name.id_for_label }}">Account Name</label>
+                                    {{ form.account_name }}
+                                    {% if form.account_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.account_name.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.account_type.id_for_label }}">Account Type</label>
+                                    {{ form.account_type }}
+                                    {% if form.account_type.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.account_type.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.interest_rate.id_for_label }}">Interest Rate (%)</label>
+                                    {{ form.interest_rate }}
+                                    {% if form.interest_rate.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.interest_rate.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.status.id_for_label }}">Status</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.status.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.daily_withdrawal_limit.id_for_label }}">Daily Withdrawal Limit</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        {{ form.daily_withdrawal_limit }}
+                                    </div>
+                                    {% if form.daily_withdrawal_limit.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.daily_withdrawal_limit.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.daily_transfer_limit.id_for_label }}">Daily Transfer Limit</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        {{ form.daily_transfer_limit }}
+                                    </div>
+                                    {% if form.daily_transfer_limit.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.daily_transfer_limit.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group form-check">
+                            {{ form.is_overdraft_allowed }}
+                            <label class="form-check-label" for="{{ form.is_overdraft_allowed.id_for_label }}">
+                                Allow Overdraft
+                            </label>
+                        </div>
+                        
+                        <div class="form-group" id="overdraft-limit-group" style="display: none;">
+                            <label for="{{ form.overdraft_limit.id_for_label }}">Overdraft Limit</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                {{ form.overdraft_limit }}
+                            </div>
+                            {% if form.overdraft_limit.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.overdraft_limit.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'account_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to Accounts
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Show/hide overdraft limit field based on checkbox
+document.getElementById('{{ form.is_overdraft_allowed.id_for_label }}').addEventListener('change', function() {
+    document.getElementById('overdraft-limit-group').style.display = this.checked ? 'block' : 'none';
+});
+
+// Trigger change event on page load to set initial state
+document.getElementById('{{ form.is_overdraft_allowed.id_for_label }}').dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

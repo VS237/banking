@@ -1,0 +1,56 @@
+{% extends 'banking/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="site-section bg-light" id="pricing-section">
+      <div class="container">
+        <div class="row mb-5">
+          <div class="col-12 text-center" data-aos="fade-up">
+            <h2 class="section-title mb-3">Transaction Method</h2>
+          </div>
+        </div>
+        <div class="row mb-5">
+          <div class="col-md-6 mb-4 mb-lg-0 col-lg-4" data-aos="fade-up" data-aos-delay="">
+            <div class="pricing">
+              <h3 class="text-center text-black">Using Mobile Payment</h3>
+              
+                <img src="{% static 'images/OIP.jpeg' %}" alt="Free Website Template by Free-Template.co" class="img-fluid w-100 mb-4">
+              
+             
+              <p class="text-center">
+                <a href="#" class="btn btn-secondary">Proceed</a>
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4 mb-lg-0 col-lg-4 pricing-popular" data-aos="fade-up" data-aos-delay="100">
+            <div class="pricing">
+              <h3 class="text-center text-black">Using Your Bank Account</h3>
+             
+              <img src="{% static 'images/img_2.jpg' %}" alt="Free Website Template by Free-Template.co" class="img-fluid w-100 mb-4">
+          
+              
+              <p class="text-center">
+                <a href="{% url 'transaction' %}" class="btn btn-secondary">Proceed</a>
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4 mb-lg-0 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="pricing">
+              <h3 class="text-center text-black">Bitcoin</h3>
+              <img src="{% static 'images/img_4.jpg' %}" alt="Free Website Template by Free-Template.co" class="img-fluid w-100 mb-4">
+              
+              <p class="text-center">
+                <a href="#" class="btn btn-secondary">Proceed</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div>
+    </section>
+
+{% endblock %}

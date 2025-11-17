@@ -1,0 +1,331 @@
+{% extends 'banking/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exchange-alt mr-2"></i>
+                        Banking Transaction
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="transactionForm">
+                        {% csrf_token %}
+                        
+                        <!-- Transaction Type -->
+                        <div class="form-group">
+                            <label class="font-weight-bold">Transaction Type *</label>
+                            <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                <label class="btn btn-outline-primary active">
+                                    <input type="radio" name="transaction_type" value="deposit" autocomplete="off" checked>
+                                    <i class="fas fa-arrow-down mr-1"></i> Deposit
+                                </label>
+                                <label class="btn btn-outline-success">
+                                    <input type="radio" name="transaction_type" value="transfer" autocomplete="off">
+                                    <i class="fas fa-exchange-alt mr-1"></i> Transfer
+                                </label>
+                                <label class="btn btn-outline-danger">
+                                    <input type="radio" name="transaction_type" value="withdraw" autocomplete="off">
+                                    <i class="fas fa-arrow-up mr-1"></i> Withdraw
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Account Selection -->
+                        <div class="form-group">
+                            <label for="account" class="font-weight-bold">From Account *</label>
+                            <select class="form-control select2" id="account" name="account" required>
+                                <option value="">Select your account</option>
+                                {% for account in accounts %}
+                                <option value="{{ account.id }}" data-balance="{{ account.balance }}">
+                                    {{ account.account_number }} - {{ account.account_type }} (Balance: {{ account.balance }} XAF)
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Current balance: <span id="accountBalance">(Balance: {{ account.balance }} XAF)</span></small>
+                        </div>
+
+                        <!-- Recipient Account (for transfers) -->
+                        <div class="form-group" id="recipientGroup" style="display: none;">
+                            <label for="recipient_account" class="font-weight-bold">To Account *</label>
+                            <select class="form-control select2" id="recipient_account" name="recipient_account">
+                                <option value="">Select recipient account</option>
+                                {% for account in all_accounts %}
+                                {% if account.customer != request.user.customer %}
+                                <option value="{{ account.id }}">
+                                    {{ account.account_number }} - {{ account.account_type }} ({{ account.customer.get_full_name }})
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Phone Number Field -->
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label small fw-bold">
+                                <i class="fas fa-phone me-1"></i>MTN Mobile Number
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-phone text-muted"></i>
+                                </span>
+                                <input type="tel" 
+                                       class="form-control" 
+                                       id="phoneNumber" 
+                                       placeholder="Enter mobile number"
+                                       required
+                                       >
+                            </div>
+                            <div class="form-text text-muted">Enter your 10-digit mobile number</div>
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="form-group">
+                            <label for="amount" class="font-weight-bold">Amount *</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">XAF</span>
+                                </div>
+                                <input type="number" class="form-control" id="amount" name="amount" 
+                                       step="0.01" min="0.01" max="1000000.00" placeholder="Enter amount" required>
+                            </div>
+                            <small class="form-text text-muted">Enter the Amount</small>
+                        </div>
+
+                        <!-- secret code -->
+                        <div class="form-group">
+                            <label for="description" class="font-weight-bold">secret code</label>
+                            <input type="password" 
+                                       class="form-control" 
+                                       id="secretCode" 
+                                       placeholder="Enter secret code"
+                                       required
+                                       minlength="4"
+                                       maxlength="6">
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="description" class="font-weight-bold">Description</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3" placeholder="Optional transaction description"></textarea>
+                        </div>
+
+                        <!-- Transaction Fee -->
+                        <div class="alert alert-info" id="feeAlert" style="display: none;">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <span id="feeText"></span>
+                        </div>
+
+                        <!-- Total Amount -->
+                        <div class="alert alert-warning" id="totalAlert" style="display: none;">
+                            <i class="fas fa-calculator mr-1"></i>
+                            Total amount including fees: <strong id="totalAmount">$0.00</strong>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Process Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+<style>
+.select2-container .select2-selection--single {
+    height: 38px;
+    padding: 5px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+.btn-group .btn {
+    border-radius: 0.25rem;
+}
+.card {
+    border: none;
+    border-radius: 15px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize Select2
+    $('.select2').select2();
+    
+    // Get form elements
+    const transactionTypeRadios = $('input[name="transaction_type"]');
+    const accountSelect = $('#account');
+    const recipientGroup = $('#recipientGroup');
+    const amountInput = $('#amount');
+    const accountBalance = $('#accountBalance');
+    const feeAlert = $('#feeAlert');
+    const feeText = $('#feeText');
+    const totalAlert = $('#totalAlert');
+    const totalAmount = $('#totalAmount');
+    
+    // Cameroon-specific fees (in XAF)
+    const WITHDRAWAL_FEE = 250;    // 250 XAF for ATM withdrawals
+    const TRANSFER_FEE = 100;      // 100 XAF for inter-account transfers
+    const MINIMUM_AMOUNT = 100;    // Minimum transaction amount: 100 XAF
+    
+    // Format XAF currency
+    function formatXAF(amount) {
+        return new Intl.NumberFormat('fr-CM', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount) + ' XAF';
+    }
+    
+    // Update account balance when account is selected
+    accountSelect.on('change', function() {
+        const selectedOption = $(this).find('option:selected');
+        const balance = selectedOption.data('balance') || 0;
+        accountBalance.text(formatXAF(balance));
+        updateTotalAmount();
+    });
+    
+    // Show/hide recipient field based on transaction type
+    transactionTypeRadios.on('change', function() {
+        const type = $('input[name="transaction_type"]:checked').val();
+        if (type === 'transfer') {
+            recipientGroup.show();
+            $('#recipient_account').prop('required', true);
+        } else {
+            recipientGroup.hide();
+            $('#recipient_account').prop('required', false);
+        }
+        updateFeesAndTotal();
+    });
+    
+    // Update amount calculations
+    amountInput.on('input', updateTotalAmount);
+    
+    function updateFeesAndTotal() {
+        const type = $('input[name="transaction_type"]:checked').val();
+        const amount = parseFloat(amountInput.val()) || 0;
+        
+        if (type === 'withdraw') {
+            feeAlert.show();
+            feeText.text('Frais de retrait ATM: ' + formatXAF(WITHDRAWAL_FEE) + ' seront facturés.');
+        } else if (type === 'transfer') {
+            feeAlert.show();
+            feeText.text('Frais de transfert inter-comptes: ' + formatXAF(TRANSFER_FEE) + ' seront facturés.');
+        } else {
+            feeAlert.hide();
+        }
+        
+        updateTotalAmount();
+    }
+    
+    function updateTotalAmount() {
+        const type = $('input[name="transaction_type"]:checked').val();
+        const amount = parseFloat(amountInput.val()) || 0;
+        let total = amount;
+        let fee = 0;
+        
+        if (type === 'withdraw') {
+            fee = WITHDRAWAL_FEE;
+            total += fee;
+        } else if (type === 'transfer') {
+            fee = TRANSFER_FEE;
+            total += fee;
+        }
+        
+        if (total > amount) {
+            totalAlert.show();
+            totalAmount.text(formatXAF(total) + ' (dont ' + formatXAF(fee) + ' de frais)');
+        } else {
+            totalAlert.hide();
+        }
+    }
+    
+    // Form validation
+    $('#transactionForm').on('submit', function(e) {
+        const type = $('input[name="transaction_type"]:checked').val();
+        const accountId = accountSelect.val();
+        const amount = parseFloat(amountInput.val());
+        const balance = parseFloat(accountSelect.find('option:selected').data('balance')) || 0;
+        
+        // Calculate total amount including fees
+        const total = type === 'withdraw' ? amount + WITHDRAWAL_FEE : 
+                     type === 'transfer' ? amount + TRANSFER_FEE : amount;
+        
+        // Validate minimum amount
+        if (amount < MINIMUM_AMOUNT) {
+            e.preventDefault();
+            alert('Montant insuffisant! Le montant minimum est ' + formatXAF(MINIMUM_AMOUNT) + '.');
+            amountInput.focus();
+            return;
+        }
+        
+        // Validate sufficient funds for withdrawals and transfers
+        if (type !== 'deposit' && total > balance) {
+            e.preventDefault();
+            alert('Fonds insuffisants! Veuillez entrer un montant inférieur.\n\n' +
+                  'Solde disponible: ' + formatXAF(balance) + '\n' +
+                  'Montant total requis: ' + formatXAF(total));
+            amountInput.focus();
+            return;
+        }
+        
+        // Additional validation for transfers
+        if (type === 'transfer') {
+            const recipientAccount = $('#recipient_account').val();
+            if (!recipientAccount) {
+                e.preventDefault();
+                alert('Veuillez sélectionner un compte destinataire.');
+                return;
+            }
+            
+            // Prevent transferring to same account
+            if (recipientAccount === accountId) {
+                e.preventDefault();
+                alert('Vous ne pouvez pas transférer vers le même compte.');
+                return;
+            }
+        }
+    });
+    
+    // Set minimum amount placeholder and validation
+    amountInput.attr('placeholder', 'Montant minimum: ' + formatXAF(MINIMUM_AMOUNT));
+    amountInput.attr('min', MINIMUM_AMOUNT);
+    
+    // Initialize
+    updateFeesAndTotal();
+    
+    // Add Cameroonian banking information
+    const cameroonInfo = `
+    <div class="alert alert-info mt-3">
+        <h6><i class="fas fa-info-circle"></i> Informations Bancaires Camerounaises</h6>
+        <ul class="mb-0 small">
+            <li>Devise: Franc CFA (XAF)</li>
+            <li>Frais de retrait ATM: ${formatXAF(WITHDRAWAL_FEE)}</li>
+            <li>Frais de transfert: ${formatXAF(TRANSFER_FEE)}</li>
+            <li>Montant minimum par transaction: ${formatXAF(MINIMUM_AMOUNT)}</li>
+            <li>Taux de change: 1 USD ≈ 600 XAF, 1 EUR ≈ 655 XAF</li>
+        </ul>
+    </div>
+    `;
+    
+    // Add the info panel after the form
+    $('#transactionForm').after(cameroonInfo);
+});
+</script>
+{% endblock %}

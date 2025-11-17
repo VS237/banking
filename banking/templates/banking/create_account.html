@@ -1,0 +1,94 @@
+{% load crispy_forms_tags %}  <!-- This line must be at the top -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Title{% endblock %}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .post-card {
+      transition: transform 0.2s;
+    }
+    .post-card:hover {
+      transform: translateY(-5px);
+    }
+    .content-section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+    <div class="content-section">
+      <div class="content-section">
+        <h2 class="section-title mb-3" data-aos="fade-up" data-aos-delay="">Create Your Account</h2>
+
+      {% if messages %}
+      <div class="messages">
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+      </div>
+      {% endif %}
+      
+      <form method="POST" action="{% url 'create_account' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-primary" type="submit">Create Account</button>
+        
+      </form>
+      </div>
+    </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+{% block extra_js %}
+<script>
+function updateAccountDefaults() {
+    const accountType = document.getElementById('id_account_type').value;
+    const accountDefaults = {
+        'Savings': { interest: 1.5, withdrawal: 1000.00, transfer: 5000.00 },
+        'Checking': { interest: 0.1, withdrawal: 2000.00, transfer: 10000.00 },
+        'Business': { interest: 0.5, withdrawal: 5000.00, transfer: 25000.00 },
+        'Fixed Deposit': { interest: 3.5, withdrawal: 0.00, transfer: 0.00 },
+        'Current': { interest: 0.0, withdrawal: 3000.00, transfer: 15000.00 }
+    };
+    
+    const defaults = accountDefaults[accountType] || accountDefaults['Savings'];
+    
+    // Update the readonly fields
+    document.getElementById('id_interest_rate').value = defaults.interest;
+    document.getElementById('id_daily_withdrawal_limit').value = defaults.withdrawal;
+    document.getElementById('id_daily_transfer_limit').value = defaults.transfer;
+    
+    // Update help text
+    const withdrawalHelp = document.getElementById('withdrawal-help');
+    const transferHelp = document.getElementById('transfer-help');
+    
+    if (accountType === 'Fixed Deposit') {
+        if (withdrawalHelp) withdrawalHelp.textContent = "No withdrawals allowed for Fixed Deposit accounts";
+        if (transferHelp) transferHelp.textContent = "No transfers allowed for Fixed Deposit accounts";
+    } else {
+        if (withdrawalHelp) withdrawalHelp.textContent = `Maximum daily withdrawal: $${defaults.withdrawal}`;
+        if (transferHelp) transferHelp.textContent = `Maximum daily transfer: $${defaults.transfer}`;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateAccountDefaults();
+    
+    // Add event listener to account type dropdown
+    document.getElementById('id_account_type').addEventListener('change', updateAccountDefaults);
+});
+</script>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Data</title>
+</head>
+<body>
+    <h1>Data from MySQL</h1>
+    <ul>
+        {% for item in data_list %}
+            <li>{{ item.balance }}</li>
+        {% empty %}
+            <li>No data found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

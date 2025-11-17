@@ -1,0 +1,46 @@
+{% extends 'banking/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="site-section">
+      <div class="container">
+
+        
+        <div class="row align-items-lg-center" >
+          <div class="col-lg-6 mb-5" data-aos="fade-up" data-aos-delay="">
+
+            <div class="owl-carousel slide-one-item-alt">
+              <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid">
+              <img src="{% static 'images/img_2.jpg' %}" alt="Image" class="img-fluid">
+              <img src="{% static 'images/img_3.jpg' %}" alt="Image" class="img-fluid">
+            </div>
+            <div class="custom-direction">
+              <a href="#" class="custom-prev"><span><span class="icon-keyboard_backspace"></span></span></a><a href="#" class="custom-next"><span><span class="icon-keyboard_backspace"></span></span></a>
+            </div>
+
+          </div>
+          <div class="col-lg-5 ml-auto" data-aos="fade-up" data-aos-delay="100">
+            
+            <div class="owl-carousel slide-one-item-alt-text">
+              <div>
+                <h2 class="section-title mb-3">01. View  Your Accounts</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque nisi, deserunt necessitatibus odio magnam nihil illum
+                  neque voluptas?</p>
+
+                <p><a href="{% url 'account_list' %}" class="btn btn-primary mr-2 mb-2">View</a></p>
+              </div>
+              <div>
+                <h2 class="section-title mb-3">02. Add an Account</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque nisi, deserunt necessitatibus odio magnam nihil illum neque voluptas?</p>
+                <p><a href="{% url 'create_bank_account' %}" class="btn btn-primary mr-2 mb-2">Add</a></p>
+              </div>
+              
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </section> 
+          
+    
+    {% endblock %}

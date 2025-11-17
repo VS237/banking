@@ -1,0 +1,52 @@
+{% load crispy_forms_tags %}  <!-- This line must be at the top -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Title{% endblock %}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .post-card {
+      transition: transform 0.2s;
+    }
+    .post-card:hover {
+      transform: translateY(-5px);
+    }
+    .content-section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="content-section">
+    <div class="content-section">
+      <H2>JOIN US</H2>
+
+    
+      
+    <form method="POST" action="{% url 'register' %}">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button class="btn btn-primary" type="submit">Register</button>
+    </form>
+  </div>
+  <div class="border-top pt-3">
+    <small class="text-muted">
+      Already Have An Account? <a href="{% url 'login' %}">Log In</a>
+    </small>
+  </div>
+  </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+</body>
+</html>
